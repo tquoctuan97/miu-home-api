@@ -2,6 +2,7 @@ const apiRouter = require("express").Router()
 const userController = require("./controllers/userController")
 const postController = require("./controllers/postController")
 const followController = require("./controllers/followController")
+const restaurantController = require("./controllers/restaurantController")
 const cors = require("cors")
 
 apiRouter.use(cors())
@@ -19,6 +20,13 @@ apiRouter.post("/post/:id/edit", userController.apiMustBeLoggedIn, postControlle
 apiRouter.delete("/post/:id", userController.apiMustBeLoggedIn, postController.apiDelete)
 apiRouter.post("/create-post", userController.apiMustBeLoggedIn, postController.apiCreate)
 apiRouter.post("/search", postController.search)
+
+// Restaurant
+apiRouter.post("/restaurants", userController.apiMustBeLoggedIn, restaurantController.create)
+apiRouter.get("/restaurants", restaurantController.getAll)
+apiRouter.get("/restaurants/:id", restaurantController.getDetailById)
+
+
 
 apiRouter.post("/doesUsernameExist", userController.doesUsernameExist)
 apiRouter.post("/doesEmailExist", userController.doesEmailExist)

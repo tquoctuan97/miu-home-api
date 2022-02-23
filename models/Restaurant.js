@@ -23,7 +23,7 @@ Restaurant.prototype.cleanUp = function () {
     if (typeof (item.img) != "string") { item.img = "" }
 
     return {
-      id: ObjectID(),
+      _id: ObjectID(),
       name: sanitizeHTML(item.name.trim(), { allowedTags: [], allowedAttributes: {} }),
       price: item.price,
       img: sanitizeHTML(item.img.trim(), { allowedTags: [], allowedAttributes: {} }),
@@ -131,7 +131,7 @@ Restaurant.update = function (data, id) {
 
       data.menu = data.menu.map(item => {
         return {
-          id: ObjectID(),
+          _id: ObjectID(),
           ...item,
         }
       })
@@ -179,9 +179,9 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
     const { menu } = await Restaurant.getDetailById(id)
 
     const newMenu = menu.map(item => {
-      if (item.id == itemId) {
+      if (item._id == itemId) {
         return {
-          id: item.id,
+          _id: item._id,
           ...data
         }
       }
@@ -198,7 +198,7 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
       )
 
     if (res) {
-      resolve(res.value)
+      resolve("Update Item Success")
     } else {
       reject("Error")
     }

@@ -25,6 +25,8 @@ apiRouter.post("/search", postController.search)
 apiRouter.post("/restaurants", userController.apiMustBeLoggedIn, restaurantController.create)
 apiRouter.get("/restaurants", restaurantController.getAll)
 apiRouter.get("/restaurants/:id", restaurantController.getDetailById)
+apiRouter.put("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.update)
+apiRouter.put("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.updateMenuItem)
 
 
 

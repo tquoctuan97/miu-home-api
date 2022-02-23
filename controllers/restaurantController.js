@@ -30,6 +30,24 @@ exports.getDetailById = async function (req, res) {
   }
 }
 
+exports.update = async function (req, res) {
+  try {
+    const result = await Restaurant.update(req.body, req.params.id);
+    res.json(result)
+  } catch (error) {
+    res.json(error)
+  }
+}
+
+exports.updateMenuItem = async function (req, res) {
+  try {
+    const result = await Restaurant.updateMenuItem(req.body, req.params.id, req.params.itemId);
+    res.json(result)
+  } catch (error) {
+    res.json(error)
+  }
+}
+
 // exports.apiUpdate = function (req, res) {
 //   let post = new Post(req.body, req.apiUser._id, req.params.id)
 //   post

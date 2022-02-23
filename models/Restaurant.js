@@ -82,17 +82,120 @@ Restaurant.getAll = function () {
 
 Restaurant.getDetailById = function (id) {
   return new Promise(async function (resolve, reject) {
-    // if (typeof (id) != "string" || !ObjectID.isValid(id)) {
-    //   reject("Id is not valid")
-    //   return
-    // }
+    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
+      reject("Id is not valid")
+      return
+    }
 
     let list = await rxntsCollection.find({ _id: new ObjectID(id) }).toArray()
 
-    if (list.length) {
+    if (list.length > 0) {
       resolve(list[0])
     } else {
-      reject()
+      reject("Not Found")
+    }
+  })
+}
+
+Restaurant.update = function (data, id) {
+  return new Promise(async function (resolve, reject) {
+
+    delete data.token
+
+    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
+      reject("Id is not valid")
+    }
+
+    if (data.name === "") {
+      reject("Name is required");
+    }
+
+    if (data.menu !== undefined) {
+      if (!Array.isArray(data.menu) || data.menu.length === 0 || data.menu === "") {
+        reject("Menu is not valid");
+      }
+
+      data.menu.forEach(item => {
+        if (item.name === "") {
+          reject("Name is required")
+        }
+        if (item.price === "" || typeof (item.price) != "number") {
+          reject("Price is required")
+        }
+      })
+
+      data.menu = data.menu.map(item => {
+        return {
+          id: ObjectID(),
+          ...item,
+        }
+      })
+    }
+
+    const res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            ...data,
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Update Success")
+    } else {
+      reject("Error")
+    }
+  })
+}
+
+Restaurant.updateMenuItem = function (data, id, itemId) {
+  return new Promise(async function (resolve, reject) {
+
+    delete data.token
+
+    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
+      reject("Restaurant Id is no valid")
+    }
+
+    if (typeof (itemId) != "string" || !ObjectID.isValid(itemId)) {
+      reject("Item Id is no valid")
+    }
+
+    if (data.name === "") {
+      reject("Name is required")
+    }
+
+    if (data.price === "" || typeof (data.price) != "number") {
+      reject("Price is required")
+    }
+
+    const { menu } = await Restaurant.getDetailById(id)
+
+    const newMenu = menu.map(item => {
+      if (item.id == itemId) {
+        return {
+          id: item.id,
+          ...data
+        }
+      }
+      return item
+    })
+
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: newMenu
+          }
+        }
+      )
+
+    if (res) {
+      resolve(res.value)
+    } else {
+      reject("Error")
     }
   })
 }

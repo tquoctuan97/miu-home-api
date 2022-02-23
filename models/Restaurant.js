@@ -192,7 +192,8 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
       .findOneAndUpdate({ _id: new ObjectID(id) },
         {
           $set: {
-            menu: newMenu
+            menu: newMenu,
+            updatedDate: new Date(),
           }
         }
       )

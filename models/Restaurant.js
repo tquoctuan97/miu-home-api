@@ -73,6 +73,11 @@ Restaurant.getAll = function () {
   return new Promise(async (resolve, reject) => {
     try {
       let list = await rxntsCollection.find().toArray()
+
+      list.forEach(item => {
+        delete item.menu
+      })
+
       resolve(list)
     } catch (e) {
       reject(e)

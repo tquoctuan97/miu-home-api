@@ -218,12 +218,37 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
 }
 
 Restaurant.deleteMenuItem = function (id, itemId) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await rxntsCollection.deleteOne({ _id: new ObjectID(itemId) })
-      resolve();
-    } catch (e) {
-      reject()
+  return new Promise(async function (resolve, reject) {
+
+    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
+      reject("Restaurant Id is no valid")
+    }
+
+    if (typeof (itemId) != "string" || !ObjectID.isValid(itemId)) {
+      reject("Item Id is no valid")
+    }
+
+    const { menu } = await Restaurant.getDetailById(id)
+
+    const newMenu = menu.filter(item => {
+      return item._id != itemId
+    })
+
+  
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: newMenu,
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Delete Menu Item Success");
+    } else {
+      reject("Error")
     }
   })
 }

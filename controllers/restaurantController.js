@@ -57,6 +57,15 @@ exports.updateMenuItem = async function (req, res) {
   }
 }
 
+exports.deleteMenuItem = async function (req, res) {
+  try {
+    const result = await Restaurant.deleteMenuItem(req.params.id, req.params.itemId);
+    res.json(result)
+  } catch (error) {
+    res.json(error)
+  }
+}
+
 
 // exports.apiUpdate = function (req, res) {
 //   let post = new Post(req.body, req.apiUser._id, req.params.id)

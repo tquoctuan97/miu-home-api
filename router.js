@@ -31,7 +31,7 @@ apiRouter.put("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantCo
 
 // Menu Item
 apiRouter.put("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.updateMenuItem)
-
+apiRouter.delete("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.deleteMenuItem)
 
 
 

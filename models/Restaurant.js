@@ -155,6 +155,17 @@ Restaurant.update = function (data, id) {
   })
 }
 
+Restaurant.delete = function (id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await rxntsCollection.deleteOne({ _id: new ObjectID(id) })
+      resolve("Delete Restaurant Success")
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 Restaurant.updateMenuItem = function (data, id, itemId) {
   return new Promise(async function (resolve, reject) {
 
@@ -202,6 +213,17 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
       resolve("Update Item Success")
     } else {
       reject("Error")
+    }
+  })
+}
+
+Restaurant.deleteMenuItem = function (id, itemId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await rxntsCollection.deleteOne({ _id: new ObjectID(itemId) })
+      resolve();
+    } catch (e) {
+      reject()
     }
   })
 }

@@ -22,11 +22,16 @@ apiRouter.post("/create-post", userController.apiMustBeLoggedIn, postController.
 apiRouter.post("/search", postController.search)
 
 // Restaurant
-apiRouter.post("/restaurants", userController.apiMustBeLoggedIn, restaurantController.create)
 apiRouter.get("/restaurants", restaurantController.getAll)
+
 apiRouter.get("/restaurants/:id", restaurantController.getDetailById)
+apiRouter.post("/restaurants", userController.apiMustBeLoggedIn, restaurantController.create)
+apiRouter.delete("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.delete)
 apiRouter.put("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.update)
+
+// Menu Item
 apiRouter.put("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.updateMenuItem)
+
 
 
 

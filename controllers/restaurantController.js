@@ -39,6 +39,15 @@ exports.update = async function (req, res) {
   }
 }
 
+exports.delete = async function (req, res) {
+  try {
+    const result = await Restaurant.delete(req.params.id);
+    res.json(result)
+  } catch (error) {
+    res.json(error)
+  }
+}
+
 exports.updateMenuItem = async function (req, res) {
   try {
     const result = await Restaurant.updateMenuItem(req.body, req.params.id, req.params.itemId);
@@ -47,6 +56,7 @@ exports.updateMenuItem = async function (req, res) {
     res.json(error)
   }
 }
+
 
 // exports.apiUpdate = function (req, res) {
 //   let post = new Post(req.body, req.apiUser._id, req.params.id)

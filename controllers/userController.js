@@ -2,6 +2,7 @@ const User = require("../models/User")
 const Post = require("../models/Post")
 const Follow = require("../models/Follow")
 const jwt = require("jsonwebtoken")
+const { errorHandler, responseHandler } = require("../helpers/response")
 
 // how long a token lasts before expiring
 const tokenLasts = "365d"
@@ -77,14 +78,15 @@ exports.apiLogin = function (req, res) {
   user
     .login()
     .then(function (result) {
-      res.json({
+      const data = {
         token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, { expiresIn: tokenLasts }),
         username: user.data.username,
         avatar: user.avatar
-      })
+      }
+      responseHandler(200, data, res)
     })
     .catch(function (e) {
-      res.json(false)
+      errorHandler(401, e, res)
     })
 }
 
@@ -93,14 +95,15 @@ exports.apiRegister = function (req, res) {
   user
     .register()
     .then(() => {
-      res.json({
+      const data = {
         token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, { expiresIn: tokenLasts }),
         username: user.data.username,
         avatar: user.avatar
-      })
+      }
+      responseHandler(200, data, res)
     })
     .catch(regErrors => {
-      res.status(500).send(regErrors)
+      errorHandler(500, regErrors, res)
     })
 }
 

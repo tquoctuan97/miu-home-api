@@ -89,56 +89,42 @@ Restaurant.getDetailById = function (id) {
   return new Promise(async function (resolve, reject) {
     if (typeof (id) != "string" || !ObjectID.isValid(id)) {
       reject("Id is not valid")
-      return
     }
-
-    let list = await rxntsCollection.find({ _id: new ObjectID(id) }).toArray()
-
-    if (list.length > 0) {
-      resolve(list[0])
-    } else {
-      reject("Not Found")
+    
+    try {
+      const list = await rxntsCollection.find({ _id: new ObjectID(id) }).toArray()
+      if (list.length > 0) {
+        resolve(list[0])
+      } else {
+        reject("Not Found")
+      }
+    } catch (error) {
+      reject(error)
     }
   })
 }
 
-Restaurant.update = function (data, id) {
+Restaurant.updateInfo = function (data, id) {
   return new Promise(async function (resolve, reject) {
 
     delete data.token
 
-    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
-      reject("Id is not valid")
+    try {
+      await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error);
     }
 
     if (data.name === "") {
       reject("Name is required");
     }
 
-    if (data.menu !== undefined) {
-      if (!Array.isArray(data.menu) || data.menu.length === 0 || data.menu === "") {
-        reject("Menu is not valid");
-      }
-
-      data.menu.forEach(item => {
-        if (item.name === "") {
-          reject("Name is required")
-        }
-        if (item.price === "" || typeof (item.price) != "number") {
-          reject("Price is required")
-        }
-      })
-
-      data.menu = data.menu.map(item => {
-        return {
-          _id: ObjectID(),
-          ...item,
-        }
-      })
+    if (data.menu) {
+      reject("If you want to update menu, request /restaurant/:id/menu");
     }
 
-    const res = await rxntsCollection
-      .findOneAndUpdate({ _id: new ObjectID(id) },
+    try {
+      const res = await rxntsCollection.findOneAndUpdate({ _id: new ObjectID(id) },
         {
           $set: {
             ...data,
@@ -146,12 +132,13 @@ Restaurant.update = function (data, id) {
           }
         }
       )
-
-    if (res) {
-      resolve("Update Success")
-    } else {
-      reject("Error")
+      if(res) {
+        resolve("Update Success")
+      }
+    } catch (error) {
+      reject(error);
     }
+    
   })
 }
 

@@ -1,3 +1,4 @@
+const { responseHandler, errorHandler } = require("../helpers/response")
 const Restaurant = require("../models/Restaurant")
 
 exports.create = function (req, res) {
@@ -5,64 +6,64 @@ exports.create = function (req, res) {
   post
     .create()
     .then(function (newId) {
-      res.json(newId)
+      responseHandler(201, newId, res);
     })
-    .catch(function (errors) {
-      res.json(errors)
+    .catch(function (error) {
+      errorHandler(400, error, res);
     })
 }
 
 exports.getAll = async function (req, res) {
   try {
     let list = await Restaurant.getAll()
-    res.json(list)
-  } catch (e) {
-    res.json(e)
+    responseHandler(200, list, res);
+  } catch (error) {
+    errorHandler(400, error, res);
   }
 }
 
 exports.getDetailById = async function (req, res) {
   try {
     let detail = await Restaurant.getDetailById(req.params.id)
-    res.json(detail)
-  } catch (e) {
-    res.json(e)
+    return responseHandler(detail, res);
+  } catch (error) {
+    return errorHandler(error, res);
   }
 }
 
 exports.update = async function (req, res) {
   try {
-    const result = await Restaurant.update(req.body, req.params.id);
-    res.json(result)
+    const result = await Restaurant.updateInfo(req.body, req.params.id);
+    responseHandler(200, result, res);
   } catch (error) {
-    res.json(error)
+    errorHandler(400, error, res);
   }
 }
 
 exports.delete = async function (req, res) {
   try {
     const result = await Restaurant.delete(req.params.id);
-    res.json(result)
+    responseHandler(204, result, res);
   } catch (error) {
-    res.json(error)
+    errorHandler(400, error, res);
   }
 }
 
 exports.updateMenuItem = async function (req, res) {
   try {
     const result = await Restaurant.updateMenuItem(req.body, req.params.id, req.params.itemId);
-    res.json(result)
+    responseHandler(200, result, res);
   } catch (error) {
-    res.json(error)
+    errorHandler(400, error, res);
   }
 }
 
 exports.deleteMenuItem = async function (req, res) {
   try {
     const result = await Restaurant.deleteMenuItem(req.params.id, req.params.itemId);
-    res.json(result)
+    responseHandler(204, result, res);
   } catch (error) {
-    res.json(error)
+    errorHandler(400, error, res);
   }
 }
 

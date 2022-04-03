@@ -107,7 +107,9 @@ Restaurant.getDetailById = function (id) {
 Restaurant.updateInfo = function (data, id) {
   return new Promise(async function (resolve, reject) {
 
+    delete data._id
     delete data.token
+    delete data.updatedDate
 
     try {
       await Restaurant.getDetailById(id);

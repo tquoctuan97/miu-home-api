@@ -107,10 +107,6 @@ Restaurant.getDetailById = function (id) {
 Restaurant.updateInfo = function (data, id) {
   return new Promise(async function (resolve, reject) {
 
-    delete data._id
-    delete data.token
-    delete data.updatedDate
-
     try {
       await Restaurant.getDetailById(id);
     } catch (error) {
@@ -121,6 +117,10 @@ Restaurant.updateInfo = function (data, id) {
       reject("Name is required");
     }
 
+    if (data.author === "") {
+      reject("Author is required");
+    }
+
     if (data.menu) {
       reject("If you want to update menu, request /restaurant/:id/menu");
     }
@@ -129,7 +129,9 @@ Restaurant.updateInfo = function (data, id) {
       const res = await rxntsCollection.findOneAndUpdate({ _id: new ObjectID(id) },
         {
           $set: {
-            ...data,
+            name: data.name,
+            thumbnail: data.thumbnail,
+            author: data.author,
             updatedDate: new Date(),
           }
         }
@@ -151,6 +153,58 @@ Restaurant.delete = function (id) {
       resolve("Delete Restaurant Success")
     } catch (e) {
       reject(e)
+    }
+  })
+}
+
+Restaurant.addMenuItem = function (data, id) {
+  return new Promise(async function (resolve, reject) {
+
+    delete data.token
+
+    try {
+      await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error);
+    }
+
+    if (data.name === "") {
+      reject("Name is required")
+    }
+
+    if (data.price === "" || typeof (data.price) != "number") {
+      reject("Price is required")
+    }
+
+    const { menu } = await Restaurant.getDetailById(id)
+
+    const menuItem = {
+      _id: ObjectID(),
+      name: data.name,
+      price: data.price,
+      img: ""
+    }
+
+    if(data.img) {
+      menuItem.img = data.img
+    }
+
+    const newMenu = menu.concat([menuItem])
+  
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: newMenu,
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Create Menu Item Success")
+    } else {
+      reject("Error")
     }
   })
 }
@@ -209,8 +263,10 @@ Restaurant.updateMenuItem = function (data, id, itemId) {
 Restaurant.deleteMenuItem = function (id, itemId) {
   return new Promise(async function (resolve, reject) {
 
-    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
-      reject("Restaurant Id is no valid")
+    try {
+      await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error);
     }
 
     if (typeof (itemId) != "string" || !ObjectID.isValid(itemId)) {
@@ -241,6 +297,34 @@ Restaurant.deleteMenuItem = function (id, itemId) {
     }
   })
 }
+
+Restaurant.deleteMenu = function (id) {
+  return new Promise(async function (resolve, reject) {
+
+    try {
+      await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error);
+    }
+  
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: [],
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Delete Menu Success");
+    } else {
+      reject("Error")
+    }
+  })
+}
+
 
 // Restaurant.prototype.update = function () {
 //   return new Promise(async (resolve, reject) => {

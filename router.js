@@ -30,6 +30,9 @@ apiRouter.delete("/restaurants/:id", userController.apiMustBeLoggedIn, restauran
 apiRouter.put("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.update)
 
 // Menu Item
+apiRouter.post("/restaurants/:id/menu/", userController.apiMustBeLoggedIn, restaurantController.addMenuItem)
+apiRouter.delete("/restaurants/:id/menu/", userController.apiMustBeLoggedIn, restaurantController.deleteMenu)
+
 apiRouter.put("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.updateMenuItem)
 apiRouter.delete("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.deleteMenuItem)
 

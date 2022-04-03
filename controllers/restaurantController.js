@@ -49,6 +49,16 @@ exports.delete = async function (req, res) {
   }
 }
 
+// Menu
+exports.addMenuItem = async function (req, res) {
+  try {
+    const result = await Restaurant.addMenuItem(req.body, req.params.id);
+    responseHandler(200, result, res);
+  } catch (error) {
+    errorHandler(400, error, res);
+  }
+}
+
 exports.updateMenuItem = async function (req, res) {
   try {
     const result = await Restaurant.updateMenuItem(req.body, req.params.id, req.params.itemId);
@@ -62,6 +72,15 @@ exports.deleteMenuItem = async function (req, res) {
   try {
     const result = await Restaurant.deleteMenuItem(req.params.id, req.params.itemId);
     responseHandler(204, result, res);
+  } catch (error) {
+    errorHandler(400, error, res);
+  }
+}
+
+exports.deleteMenu = async function (req, res) {
+  try {
+    const result = await Restaurant.deleteMenu(req.params.id);
+    responseHandler(200, result, res);
   } catch (error) {
     errorHandler(400, error, res);
   }

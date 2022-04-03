@@ -25,9 +25,9 @@ exports.getAll = async function (req, res) {
 exports.getDetailById = async function (req, res) {
   try {
     let detail = await Restaurant.getDetailById(req.params.id)
-    return responseHandler(detail, res);
+    return responseHandler(200, detail, res);
   } catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(400, error, res);
   }
 }
 

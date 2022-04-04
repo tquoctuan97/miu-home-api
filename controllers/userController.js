@@ -79,9 +79,10 @@ exports.apiLogin = function (req, res) {
     .login()
     .then(function (result) {
       const data = {
-        token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, { expiresIn: tokenLasts }),
+        _id: user.data._id,
         username: user.data.username,
-        avatar: user.avatar
+        avatar: user.avatar,
+        token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, { expiresIn: tokenLasts }),
       }
       responseHandler(200, data, res)
     })

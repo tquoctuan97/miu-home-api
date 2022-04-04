@@ -178,8 +178,10 @@ Restaurant.addMenuItem = function (data, id) {
 
     const { menu } = await Restaurant.getDetailById(id)
 
+    const itemId = ObjectID()
+
     const menuItem = {
-      _id: ObjectID(),
+      _id: itemId,
       name: data.name,
       price: data.price,
       img: ""
@@ -202,7 +204,7 @@ Restaurant.addMenuItem = function (data, id) {
       )
 
     if (res) {
-      resolve("Create Menu Item Success")
+      resolve(itemId)
     } else {
       reject("Error")
     }

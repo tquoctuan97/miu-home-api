@@ -15,6 +15,7 @@ Restaurant.prototype.cleanUp = function () {
   if (typeof (this.data.name) != "string") { this.data.name = "" }
   if (typeof (this.data.thumbnail) != "string") { this.data.thumbnail = "" }
   if (!Array.isArray(this.data.menu)) { this.data.menu = "" }
+  if (typeof (this.data.status) != "string") { this.data.status = "" }
 
   // get rid of any bogus properties
   const menu = this.data.menu.map((item) => {
@@ -34,6 +35,7 @@ Restaurant.prototype.cleanUp = function () {
     name: sanitizeHTML(this.data.name.trim(), { allowedTags: [], allowedAttributes: {} }),
     thumbnail: sanitizeHTML(this.data.thumbnail.trim(), { allowedTags: [], allowedAttributes: {} }),
     menu: menu,
+    status: sanitizeHTML(this.data.status.trim(), { allowedTags: [], allowedAttributes: {} }),
     createdDate: new Date(),
     updatedDate: new Date(),
     author: ObjectID(this.userid)
@@ -43,6 +45,12 @@ Restaurant.prototype.cleanUp = function () {
 Restaurant.prototype.validate = function () {
   if (this.data.name === "") { this.errors.push("You must provide a name") }
   if (this.data.menu.length < 0) { this.errors.push("You must provide menu") }
+  
+  if (this.data.status === "") { 
+    this.errors.push("You must provide a status") 
+  } else if (!["draft","published","private"].includes(this.data.status)) { 
+    this.errors.push("Only 3 statuses allowed: draft, published, private") 
+  }
 
   this.data.menu.forEach((item, index) => {
     if (item.name === "") { this.errors.push(`Name of item ${index} cannot be empty`) }
@@ -121,6 +129,12 @@ Restaurant.updateInfo = function (data, id) {
       reject("Author is required");
     }
 
+    if (data.status === "") {
+      reject("Status is required");
+    } else if (!["draft","published","private"].includes(data.status)) { 
+      reject("Only 3 statuses allowed: draft, published, private") 
+    }
+
     if (data.menu) {
       reject("If you want to update menu, request /restaurant/:id/menu");
     }
@@ -131,6 +145,7 @@ Restaurant.updateInfo = function (data, id) {
           $set: {
             name: data.name,
             thumbnail: data.thumbnail,
+            status: data.status,
             author: data.author,
             updatedDate: new Date(),
           }

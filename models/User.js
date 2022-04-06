@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs")
 const usersCollection = require('../db').db().collection("users")
 const validator = require("validator")
 const md5 = require('md5')
+const ObjectID = require('mongodb').ObjectID
 
 let User = function(data, getAvatar) {
   this.data = data
@@ -127,6 +128,25 @@ User.doesEmailExist = function(email) {
       resolve(true)
     } else {
       resolve(false)
+    }
+  })
+}
+
+User.doesUserExist = function(id) {
+  return new Promise(async function (resolve, reject) {
+    if (typeof (id) != "string" || !ObjectID.isValid(id)) {
+      reject("AuthorId is not valid")
+    }
+
+    try {
+      const user = await usersCollection.findOne({_id: new ObjectID(id)})
+      if (user) {
+        resolve(true)
+      } else {
+        reject("User does not exist")
+      }
+    } catch (error) {
+      reject(error)
     }
   })
 }

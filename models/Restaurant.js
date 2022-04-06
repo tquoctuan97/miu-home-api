@@ -1,5 +1,6 @@
 const rxntsCollection = require('../db').db().collection("restaurants")
 const ObjectID = require('mongodb').ObjectID
+const User = require('./User')
 const sanitizeHTML = require('sanitize-html')
 
 // postsCollection.createIndex({title: "text", body: "text"})
@@ -121,15 +122,21 @@ Restaurant.updateInfo = function (data, id) {
       reject(error);
     }
 
-    if (data.name === "") {
+    if (!data.name) {
       reject("Name is required");
     }
 
-    if (data.author === "") {
+    if (!data.author) {
       reject("Author is required");
     }
 
-    if (data.status === "") {
+    try {
+      await User.doesUserExist(data.author)
+    } catch (error) {
+      reject(error);
+    }
+
+    if (!data.status) {
       reject("Status is required");
     } else if (!["draft","published","private"].includes(data.status)) { 
       reject("Only 3 statuses allowed: draft, published, private") 
@@ -137,6 +144,10 @@ Restaurant.updateInfo = function (data, id) {
 
     if (data.menu) {
       reject("If you want to update menu, request /restaurant/:id/menu");
+    }
+
+    if (!data.thumbnail) {
+      data.thumbnail = ""
     }
 
     try {
@@ -157,7 +168,6 @@ Restaurant.updateInfo = function (data, id) {
     } catch (error) {
       reject(error);
     }
-    
   })
 }
 
@@ -342,127 +352,5 @@ Restaurant.deleteMenu = function (id) {
   })
 }
 
-
-// Restaurant.prototype.update = function () {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       let post = await Post.findSingleById(this.requestedPostId, this.userid)
-//       if (post.isVisitorOwner) {
-//         // actually update the db
-//         let status = await this.actuallyUpdate()
-//         resolve(status)
-//       } else {
-//         reject()
-//       }
-//     } catch (e) {
-//       reject()
-//     }
-//   })
-// }
-
-// Restaurant.prototype.actuallyUpdate = function () {
-//   return new Promise(async (resolve, reject) => {
-//     this.cleanUp()
-//     this.validate()
-//     if (!this.errors.length) {
-//       await postsCollection.findOneAndUpdate({ _id: new ObjectID(this.requestedPostId) }, { $set: { title: this.data.title, body: this.data.body } })
-//       resolve("success")
-//     } else {
-//       resolve("failure")
-//     }
-//   })
-// }
-
-// Restaurant.reusablePostQuery = function (uniqueOperations, visitorId, finalOperations = []) {
-//   return new Promise(async function (resolve, reject) {
-//     let aggOperations = uniqueOperations.concat([
-//       { $lookup: { from: "users", localField: "author", foreignField: "_id", as: "authorDocument" } },
-//       {
-//         $project: {
-//           title: 1,
-//           body: 1,
-//           createdDate: 1,
-//           authorId: "$author",
-//           author: { $arrayElemAt: ["$authorDocument", 0] }
-//         }
-//       }
-//     ]).concat(finalOperations)
-
-//     let posts = await postsCollection.aggregate(aggOperations).toArray()
-
-//     // clean up author property in each post object
-//     posts = posts.map(function (post) {
-//       post.isVisitorOwner = post.authorId.equals(visitorId)
-//       post.authorId = undefined
-
-//       post.author = {
-//         username: post.author.username,
-//         avatar: new User(post.author, true).avatar
-//       }
-
-//       return post
-//     })
-
-//     resolve(posts)
-//   })
-// }
-
-// Restaurant.findByAuthorId = function (authorId) {
-//   return Post.reusablePostQuery([
-//     { $match: { author: authorId } },
-//     { $sort: { createdDate: -1 } }
-//   ])
-// }
-
-// Restaurant.delete = function (postIdToDelete, currentUserId) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       let post = await Post.findSingleById(postIdToDelete, currentUserId)
-//       if (post.isVisitorOwner) {
-//         await postsCollection.deleteOne({ _id: new ObjectID(postIdToDelete) })
-//         resolve()
-//       } else {
-//         reject()
-//       }
-//     } catch (e) {
-//       reject()
-//     }
-//   })
-// }
-
-
-// Restaurant.search = function (searchTerm) {
-//   return new Promise(async (resolve, reject) => {
-//     if (typeof (searchTerm) == "string") {
-//       let posts = await Post.reusablePostQuery([
-//         { $match: { $text: { $search: searchTerm } } }
-//       ], undefined, [{ $sort: { score: { $meta: "textScore" } } }])
-//       resolve(posts)
-//     } else {
-//       reject()
-//     }
-//   })
-// }
-
-// Restaurant.countPostsByAuthor = function (id) {
-//   return new Promise(async (resolve, reject) => {
-//     let postCount = await postsCollection.countDocuments({ author: id })
-//     resolve(postCount)
-//   })
-// }
-
-// Restaurant.getFeed = async function (id) {
-//   // create an array of the user ids that the current user follows
-//   let followedUsers = await followsCollection.find({ authorId: new ObjectID(id) }).toArray()
-//   followedUsers = followedUsers.map(function (followDoc) {
-//     return followDoc.followedId
-//   })
-
-//   // look for posts where the author is in the above array of followed users
-//   return Post.reusablePostQuery([
-//     { $match: { author: { $in: followedUsers } } },
-//     { $sort: { createdDate: -1 } }
-//   ])
-// }
 
 module.exports = Restaurant

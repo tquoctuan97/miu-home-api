@@ -87,6 +87,15 @@ exports.deleteType = async function (req, res) {
 }
 
 // Dishes
+exports.getDishList = async function (req, res) {
+  try {
+    const result = await Restaurant.getDishList(req.params.id, req.query.typeId)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
 exports.addDish = async function (req, res) {
   try {
     const result = await Restaurant.addDish(req.body, req.params.id);

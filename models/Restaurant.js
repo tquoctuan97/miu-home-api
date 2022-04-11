@@ -430,6 +430,36 @@ Restaurant.doesDishExist = function (id, dishId) {
   })
 }
 
+Restaurant.getDishList = function (id, typeId) {
+  return new Promise(async function (resolve, reject) {
+
+    let restaurant = {}
+
+    try {
+      restaurant = await Restaurant.getDetailById(id);
+      if(typeId) {
+        await Restaurant.doesTypeExist(id, typeId);
+      }
+    } catch (error) {
+      reject(error)
+      return
+    }
+
+    if(!typeId) {
+      resolve(restaurant.menu.dishList)
+      return
+    }
+
+    const filterDishList = restaurant.menu.dishList.filter(item => item.typeId === typeId)
+
+    if(filterDishList.length > 0) {
+      resolve(filterDishList)
+    } else {
+      reject(`Dish List by ${typeId} is empty`)
+    }
+  })
+}
+
 Restaurant.addDish = function (data, id) {
   return new Promise(async function (resolve, reject) {
 

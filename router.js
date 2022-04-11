@@ -37,6 +37,7 @@ apiRouter.put("/restaurants/:id/types/:typeId", userController.apiMustBeLoggedIn
 apiRouter.delete("/restaurants/:id/types/:typeId", userController.apiMustBeLoggedIn, restaurantController.deleteType)
 
 // Dish
+apiRouter.get("/restaurants/:id/dishes/", restaurantController.getDishList)
 apiRouter.post("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, restaurantController.addDish)
 apiRouter.put("/restaurants/:id/dishes/:dishId", userController.apiMustBeLoggedIn, restaurantController.updateDish)
 apiRouter.delete("/restaurants/:id/dishes/:dishId", userController.apiMustBeLoggedIn, restaurantController.deleteDish)

@@ -43,43 +43,80 @@ exports.update = async function (req, res) {
 exports.delete = async function (req, res) {
   try {
     const result = await Restaurant.delete(req.params.id);
-    responseHandler(204, result, res);
-  } catch (error) {
-    errorHandler(400, error, res);
-  }
-}
-
-// Menu
-exports.addMenuItem = async function (req, res) {
-  try {
-    const result = await Restaurant.addMenuItem(req.body, req.params.id);
     responseHandler(200, result, res);
   } catch (error) {
     errorHandler(400, error, res);
   }
 }
 
-exports.updateMenuItem = async function (req, res) {
+// Types
+exports.getTypeList = async function (req, res) {
   try {
-    const result = await Restaurant.updateMenuItem(req.body, req.params.id, req.params.itemId);
+    const result = await Restaurant.getTypeList(req.params.id)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
+exports.addType = async function (req, res) {
+  try {
+    const result = await Restaurant.addType(req.body, req.params.id)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
+exports.updateType = async function (req, res) {
+  try {
+    const result = await Restaurant.updateType(req.body, req.params.id, req.params.typeId)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
+exports.deleteType = async function (req, res) {
+  try {
+    const result = await Restaurant.deleteType(req.params.id, req.params.typeId)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
+// Dishes
+exports.addDish = async function (req, res) {
+  try {
+    const result = await Restaurant.addDish(req.body, req.params.id);
     responseHandler(200, result, res);
   } catch (error) {
     errorHandler(400, error, res);
   }
 }
 
-exports.deleteMenuItem = async function (req, res) {
+exports.updateDish = async function (req, res) {
   try {
-    const result = await Restaurant.deleteMenuItem(req.params.id, req.params.itemId);
-    responseHandler(204, result, res);
+    const result = await Restaurant.updateDish(req.body, req.params.id, req.params.dishId);
+    responseHandler(200, result, res);
   } catch (error) {
     errorHandler(400, error, res);
   }
 }
 
-exports.deleteMenu = async function (req, res) {
+exports.deleteDish = async function (req, res) {
   try {
-    const result = await Restaurant.deleteMenu(req.params.id);
+    const result = await Restaurant.deleteDish(req.params.id, req.params.dishId);
+    responseHandler(200, result, res);
+  } catch (error) {
+    errorHandler(400, error, res);
+  }
+}
+
+exports.deleteAllDish = async function (req, res) {
+  try {
+    const result = await Restaurant.deleteAllDish(req.params.id);
     responseHandler(200, result, res);
   } catch (error) {
     errorHandler(400, error, res);

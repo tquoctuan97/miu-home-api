@@ -29,12 +29,20 @@ apiRouter.post("/restaurants", userController.apiMustBeLoggedIn, restaurantContr
 apiRouter.delete("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.delete)
 apiRouter.put("/restaurants/:id", userController.apiMustBeLoggedIn, restaurantController.update)
 
-// Menu Item
-apiRouter.post("/restaurants/:id/menu/", userController.apiMustBeLoggedIn, restaurantController.addMenuItem)
-apiRouter.delete("/restaurants/:id/menu/", userController.apiMustBeLoggedIn, restaurantController.deleteMenu)
 
-apiRouter.put("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.updateMenuItem)
-apiRouter.delete("/restaurants/:id/menu/:itemId", userController.apiMustBeLoggedIn, restaurantController.deleteMenuItem)
+// Type Of Dish
+apiRouter.get("/restaurants/:id/types/", restaurantController.getTypeList)
+apiRouter.post("/restaurants/:id/types/", userController.apiMustBeLoggedIn, restaurantController.addType)
+apiRouter.put("/restaurants/:id/types/:typeId", userController.apiMustBeLoggedIn, restaurantController.updateType)
+apiRouter.delete("/restaurants/:id/types/:typeId", userController.apiMustBeLoggedIn, restaurantController.deleteType)
+
+// Dish
+apiRouter.post("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, restaurantController.addDish)
+apiRouter.put("/restaurants/:id/dishes/:dishId", userController.apiMustBeLoggedIn, restaurantController.updateDish)
+apiRouter.delete("/restaurants/:id/dishes/:dishId", userController.apiMustBeLoggedIn, restaurantController.deleteDish)
+
+apiRouter.delete("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, restaurantController.deleteAllDish)
+
 
 
 

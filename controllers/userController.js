@@ -156,3 +156,12 @@ exports.profileFollowing = async function (req, res) {
     res.status(500).send("Error")
   }
 }
+
+exports.getUserInfoById = async function (req, res) {
+  try {
+    const result = await User.getUserInfoById(req.params.userId)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(500, error, res)
+  }
+}

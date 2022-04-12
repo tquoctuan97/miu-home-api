@@ -44,11 +44,12 @@ apiRouter.delete("/restaurants/:id/dishes/:dishId", userController.apiMustBeLogg
 
 apiRouter.delete("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, restaurantController.deleteAllDish)
 
-
-
-
+// User
+apiRouter.get("/users/:userId", userController.getUserInfoById)
 apiRouter.post("/doesUsernameExist", userController.doesUsernameExist)
 apiRouter.post("/doesEmailExist", userController.doesEmailExist)
+
+
 
 // profile related routes
 apiRouter.post("/profile/:username", userController.ifUserExists, userController.sharedProfileData, userController.profileBasicData)

@@ -151,4 +151,29 @@ User.doesUserExist = function(id) {
   })
 }
 
+User.getUserInfoById = function(id) {
+  return new Promise(async function(resolve, reject) {
+    if (typeof(id) != "string" || !ObjectID.isValid(id)) {
+      reject("userId is not valid")
+      return
+    }
+    try {
+      const res = await usersCollection.findOne({_id: ObjectID(id)})
+      if (res) {
+        let userDoc = new User(res, true)
+        userDoc = {
+          _id: userDoc.data._id,
+          username: userDoc.data.username,
+          avatar: userDoc.avatar,
+        }
+        resolve(userDoc)
+      } else {
+        reject("User does not exist")
+      }
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
 module.exports = User

@@ -205,6 +205,7 @@ Restaurant.updateInfo = function (data, id) {
 Restaurant.delete = function (id) {
   return new Promise(async (resolve, reject) => {
     try {
+      await Restaurant.getDetailById(id);
       await rxntsCollection.deleteOne({ _id: new ObjectID(id) })
       resolve("Delete Restaurant Success")
     } catch (e) {
@@ -498,14 +499,16 @@ Restaurant.addDish = function (data, id) {
       dishItem.img = data.img
     }
 
-    try {
-      const result = await Restaurant.doesTypeExist(id, data.typeId)
-      if(result) {
-        dishItem.typeId = data.typeId
+    if(data.typeId) {
+      try {
+        const result = await Restaurant.doesTypeExist(id, data.typeId)
+        if(result) {
+          dishItem.typeId = data.typeId
+        }
+      } catch (error) {
+        reject(error)
+        return
       }
-    } catch (error) {
-      reject(error)
-      return
     }
 
     const newDishList = [...restaurant.menu.dishList]
@@ -560,10 +563,7 @@ Restaurant.updateDish = function (data, id, dishId) {
 
     if(data.typeId) {
       try {
-        const result = await Restaurant.doesTypeExist(id, data.typeId)
-        if(result) {
-          dishItem.typeId = data.typeId
-        }
+        await Restaurant.doesTypeExist(id, data.typeId)
       } catch (error) {
         reject(error)
         return

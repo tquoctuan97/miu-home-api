@@ -45,6 +45,10 @@ apiRouter.delete("/restaurants/:id/dishes/:dishId", userController.apiMustBeLogg
 
 apiRouter.delete("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, restaurantController.deleteAllDish)
 
+// Combo
+apiRouter.get("/restaurants/:id/combos/", restaurantController.getComboList)
+
+
 // User
 apiRouter.get("/users/:userId", userController.getUserInfoById)
 apiRouter.post("/doesUsernameExist", userController.doesUsernameExist)

@@ -290,7 +290,8 @@ Restaurant.addType = function (data, id) {
           $set: {
             menu: {
               typeList: newTypeList,
-              dishList: restaurant.menu.dishList
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -343,7 +344,8 @@ Restaurant.updateType = function (data, id, typeId) {
           $set: {
             menu: {
               typeList: newTypeList,
-              dishList: restaurant.menu.dishList 
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -383,7 +385,8 @@ Restaurant.deleteType = function (id, typeId) {
           $set: {
             menu: {
               typeList: newTypeList,
-              dishList: restaurant.menu.dishList
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -521,7 +524,8 @@ Restaurant.addDish = function (data, id) {
           $set: {
             menu: {
               typeList: restaurant.menu.typeList,
-              dishList: newDishList
+              dishList: newDishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -587,6 +591,7 @@ Restaurant.updateDish = function (data, id, dishId) {
             menu: {
               typeList: restaurant.menu.typeList,
               dishList: newDishList,
+              comboList: [],
             },
             updatedDate: new Date(),
           }
@@ -625,6 +630,7 @@ Restaurant.deleteDish = function (id, dishId) {
             menu: {
               typeList: restaurant.menu.typeList,
               dishList: newDishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -666,6 +672,193 @@ Restaurant.deleteAllDish = function (id) {
 
     if (res) {
       resolve("Delete All Dishes Success");
+    } else {
+      reject("Error")
+    }
+  })
+}
+
+// Combo
+Restaurant.doesComboExist = function (id, comboId) {
+  return new Promise(async function (resolve, reject) {
+
+    let restaurant = {}
+
+    try {
+      restaurant = await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error)
+      return
+    }
+
+    if (typeof (comboId) != "string" || !ObjectID.isValid(comboId)) {
+      reject("comboId is no valid")
+      return
+    } 
+    
+    const result = restaurant.menu.comboList.find(item => item._id == comboId)
+    
+    if(result) {
+      resolve(true)  
+    } else {
+      reject(`comboId does not exist`)
+    }
+  })
+}
+
+Restaurant.getComboList = function (id) {
+  return new Promise(async function (resolve, reject) {
+    try {
+      const result = await Restaurant.getDetailById(id);
+      resolve(result.menu.comboList)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+Restaurant.addType = function (data, id) {
+  return new Promise(async function (resolve, reject) {
+
+    delete data.token
+
+    let restaurant = {}
+
+    try {
+      restaurant = await Restaurant.getDetailById(id);
+    } catch (error) {
+      reject(error)
+      return
+    }
+
+    if (data.name === "") {
+      reject("Name is required")
+      return
+    }
+
+    const typeList = restaurant.menu.typeList
+
+    const typeId = ObjectID()
+
+    const type = {
+      _id: typeId,
+      name: data.name,
+    }
+  
+
+    const newTypeList = typeList.concat([type])
+  
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: {
+              typeList: newTypeList,
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
+            },
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve(typeId)
+    } else {
+      reject("Error")
+    }
+  })
+}
+
+Restaurant.updateType = function (data, id, typeId) {
+  return new Promise(async function (resolve, reject) {
+
+    delete data.token
+
+    let restaurant = {}
+
+    try {
+      restaurant = await Restaurant.getDetailById(id)
+      await Restaurant.doesTypeExist(id, typeId)
+    } catch (error) {
+      reject(error)
+      return
+    }
+
+    if (data.name === "") {
+      reject("Name is required")
+      return
+    }
+
+    const typeList = restaurant.menu.typeList
+
+    const newTypeList = typeList.map(item => {
+      if (item._id == typeId) {
+        return {
+          _id: item._id,
+          ...data
+        }
+      }
+      return item
+    })
+
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: {
+              typeList: newTypeList,
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
+            },
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Update Type Success")
+    } else {
+      reject("Error")
+    }
+  })
+}
+
+Restaurant.deleteType = function (id, typeId) {
+  return new Promise(async function (resolve, reject) {
+
+    let restaurant = {}
+
+    try {
+      restaurant = await Restaurant.getDetailById(id)
+      await Restaurant.doesTypeExist(id, typeId)
+    } catch (error) {
+      reject(error)
+      return
+    }
+
+    const typeList = restaurant.menu.typeList
+
+    const newTypeList = typeList.filter(item => {
+      return item._id != typeId
+    })
+  
+    let res = await rxntsCollection
+      .findOneAndUpdate({ _id: new ObjectID(id) },
+        {
+          $set: {
+            menu: {
+              typeList: newTypeList,
+              dishList: restaurant.menu.dishList,
+              comboList: restaurant.menu.comboList
+            },
+            updatedDate: new Date(),
+          }
+        }
+      )
+
+    if (res) {
+      resolve("Delete Type Success");
     } else {
       reject("Error")
     }

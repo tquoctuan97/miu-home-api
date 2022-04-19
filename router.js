@@ -47,6 +47,8 @@ apiRouter.delete("/restaurants/:id/dishes/", userController.apiMustBeLoggedIn, r
 
 // Combo
 apiRouter.get("/restaurants/:id/combos/", restaurantController.getComboList)
+apiRouter.post("/restaurants/:id/combos/", userController.apiMustBeLoggedIn, restaurantController.addCombo)
+apiRouter.delete("/restaurants/:id/combos/:comboId", userController.apiMustBeLoggedIn, restaurantController.deleteCombo)
 
 
 // User

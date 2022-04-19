@@ -141,3 +141,21 @@ exports.getComboList = async function (req, res) {
     errorHandler(400, error, res)
   }
 }
+
+exports.addCombo = async function (req, res) {
+  try {
+    const result = await Restaurant.addCombo(req.body, req.params.id)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}
+
+exports.deleteCombo = async function (req, res) {
+  try {
+    const result = await Restaurant.deleteCombo(req.params.id, req.params.comboId)
+    responseHandler(200, result, res)
+  } catch (error) {
+    errorHandler(400, error, res)
+  }
+}

@@ -120,7 +120,7 @@ Restaurant.getAll = function () {
 Restaurant.getDetailById = function (id) {
   return new Promise(async function (resolve, reject) {
     if (typeof (id) != "string" || !ObjectID.isValid(id)) {
-      reject("Id is not valid")
+      reject("Restaurant ID is not valid")
       return
     }
     
@@ -590,8 +590,7 @@ Restaurant.updateDish = function (data, id, dishId) {
           $set: {
             menu: {
               typeList: restaurant.menu.typeList,
-              dishList: newDishList,
-              comboList: [],
+              dishList: newDishList
             },
             updatedDate: new Date(),
           }
@@ -717,7 +716,7 @@ Restaurant.getComboList = function (id) {
   })
 }
 
-Restaurant.addType = function (data, id) {
+Restaurant.addCombo = function (data, id) {
   return new Promise(async function (resolve, reject) {
 
     delete data.token
@@ -732,84 +731,59 @@ Restaurant.addType = function (data, id) {
     }
 
     if (data.name === "") {
-      reject("Name is required")
+      reject("Name of combo is required")
       return
     }
 
-    const typeList = restaurant.menu.typeList
-
-    const typeId = ObjectID()
-
-    const type = {
-      _id: typeId,
-      name: data.name,
-    }
-  
-
-    const newTypeList = typeList.concat([type])
-  
-    let res = await rxntsCollection
-      .findOneAndUpdate({ _id: new ObjectID(id) },
-        {
-          $set: {
-            menu: {
-              typeList: newTypeList,
-              dishList: restaurant.menu.dishList,
-              comboList: restaurant.menu.comboList
-            },
-            updatedDate: new Date(),
-          }
-        }
-      )
-
-    if (res) {
-      resolve(typeId)
-    } else {
-      reject("Error")
-    }
-  })
-}
-
-Restaurant.updateType = function (data, id, typeId) {
-  return new Promise(async function (resolve, reject) {
-
-    delete data.token
-
-    let restaurant = {}
-
-    try {
-      restaurant = await Restaurant.getDetailById(id)
-      await Restaurant.doesTypeExist(id, typeId)
-    } catch (error) {
-      reject(error)
+    if (!data.dishList) {
+      reject("dishList is required")
       return
     }
 
-    if (data.name === "") {
-      reject("Name is required")
+    if (!Array.isArray(data.dishList) || !data.dishList.length) {
+      reject("dishList must be an array and array cannot be empty")
       return
     }
 
-    const typeList = restaurant.menu.typeList
-
-    const newTypeList = typeList.map(item => {
-      if (item._id == typeId) {
-        return {
-          _id: item._id,
-          ...data
-        }
+    data.dishList.forEach(async (item, index) => {
+      if (!item._id) { reject(`_id of item ${index} is required`); return}
+      
+      try {
+        await Restaurant.doesDishExist(id, item._id);
+      } catch (error) {
+        reject(error)
+        return
       }
-      return item
+
+      if (typeof(item.quantity) != "number") { reject(`Quantity of item ${index} must be a number`); return}
+      if (item.quantity <= 0) { reject(`Quantity of item ${index} must be > 0`); return}
     })
 
+    const comboList = restaurant.menu.comboList
+
+    const comboId = ObjectID()
+
+    const combo = {
+      _id: comboId,
+      name: data.name,
+      thumbnail: "",
+      dishList: data.dishList
+    }
+
+    if (data.thumbnail) {
+      combo.thumbnail = data.thumbnail
+    }
+  
+    const newComboList = comboList.concat([combo])
+  
     let res = await rxntsCollection
       .findOneAndUpdate({ _id: new ObjectID(id) },
         {
           $set: {
             menu: {
-              typeList: newTypeList,
+              typeList: restaurant.menu.typeList,
               dishList: restaurant.menu.dishList,
-              comboList: restaurant.menu.comboList
+              comboList: newComboList
             },
             updatedDate: new Date(),
           }
@@ -817,30 +791,30 @@ Restaurant.updateType = function (data, id, typeId) {
       )
 
     if (res) {
-      resolve("Update Type Success")
+      resolve(comboId)
     } else {
       reject("Error")
     }
   })
 }
 
-Restaurant.deleteType = function (id, typeId) {
+Restaurant.deleteCombo = function (id, comboId) {
   return new Promise(async function (resolve, reject) {
 
     let restaurant = {}
 
     try {
       restaurant = await Restaurant.getDetailById(id)
-      await Restaurant.doesTypeExist(id, typeId)
+      await Restaurant.doesComboExist(id, comboId)
     } catch (error) {
       reject(error)
       return
     }
 
-    const typeList = restaurant.menu.typeList
+    const comboList = restaurant.menu.comboList
 
-    const newTypeList = typeList.filter(item => {
-      return item._id != typeId
+    const newComboList = comboList.filter(item => {
+      return item._id != comboId
     })
   
     let res = await rxntsCollection
@@ -848,9 +822,9 @@ Restaurant.deleteType = function (id, typeId) {
         {
           $set: {
             menu: {
-              typeList: newTypeList,
+              typeList: restaurant.menu.typeList,
               dishList: restaurant.menu.dishList,
-              comboList: restaurant.menu.comboList
+              comboList: newComboList
             },
             updatedDate: new Date(),
           }
@@ -858,12 +832,11 @@ Restaurant.deleteType = function (id, typeId) {
       )
 
     if (res) {
-      resolve("Delete Type Success");
+      resolve("Delete combo success");
     } else {
       reject("Error")
     }
   })
 }
-
 
 module.exports = Restaurant

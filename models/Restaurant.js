@@ -51,6 +51,7 @@ Restaurant.prototype.cleanUp = function () {
     menu: {
       typeList: typeList,
       dishList: dishList,
+      comboList: [],
     },
     status: sanitizeHTML(this.data.status.trim(), { allowedTags: [], allowedAttributes: {} }),
     createdDate: new Date(),
@@ -69,7 +70,7 @@ Restaurant.prototype.validate = function () {
     this.errors.push("Only 3 statuses are allowed: draft, published, private") 
   }
 
-  if(this.data.menu.typeList.length > 0) {
+  if (this.data.menu.typeList.length > 0) {
     this.data.menu.typeList.forEach((item, index) => {
       if (item.name === "") { this.errors.push(`Name of type item ${index} cannot be empty`) }
     })
@@ -590,7 +591,8 @@ Restaurant.updateDish = function (data, id, dishId) {
           $set: {
             menu: {
               typeList: restaurant.menu.typeList,
-              dishList: newDishList
+              dishList: newDishList,
+              comboList: restaurant.menu.comboList
             },
             updatedDate: new Date(),
           }
@@ -662,7 +664,8 @@ Restaurant.deleteAllDish = function (id) {
           $set: {
             menu: {
               typeList: restaurant.menu.typeList,
-              dishList: []
+              dishList: [],
+              comboList: restaurant.menu.comboList,
             },
             updatedDate: new Date(),
           }

@@ -4,10 +4,11 @@ const postController = require("./controllers/postController")
 const followController = require("./controllers/followController")
 const restaurantController = require("./controllers/restaurantController")
 const cors = require("cors")
+const { responseHandler } = require("./helpers/response")
 
 apiRouter.use(cors())
 
-apiRouter.get("/", (req, res) => res.json("Hello, if you see this message that means your backend is up and running successfully. Congrats! Now let's continue learning React!"))
+apiRouter.get("/", (req, res) => responseHandler(200, "Server is running", res))
 
 // check token to log out front-end if expired
 apiRouter.post("/checkToken", userController.checkToken)

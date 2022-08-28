@@ -102,10 +102,13 @@ Restaurant.prototype.create = function () {
   })
 }
 
-Restaurant.getAll = function () {
+Restaurant.getAll = function (status = "published") {
   return new Promise(async (resolve, reject) => {
     try {
-      let list = await rxntsCollection.find().toArray()
+      if(!["published","private","draft"].includes(status)) {
+        reject("status is not valid")
+      }
+      let list = await rxntsCollection.find({ status: status }).toArray()
 
       list.forEach(item => {
         delete item.menu

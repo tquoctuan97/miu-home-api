@@ -14,8 +14,9 @@ exports.create = function (req, res) {
 }
 
 exports.getAll = async function (req, res) {
+  const status = req.query.status;
   try {
-    let list = await Restaurant.getAll()
+    let list = await Restaurant.getAll(status)
     responseHandler(200, list, res);
   } catch (error) {
     errorHandler(400, error, res);

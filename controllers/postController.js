@@ -42,16 +42,6 @@ exports.apiDelete = function(req, res) {
     })
 }
 
-exports.search = function(req, res) {
-  Post.search(req.body.searchTerm)
-    .then(posts => {
-      res.json(posts)
-    })
-    .catch(e => {
-      res.json([])
-    })
-}
-
 exports.reactApiViewSingle = async function(req, res) {
   try {
     let post = await Post.findSingleById(req.params.id, 0)
